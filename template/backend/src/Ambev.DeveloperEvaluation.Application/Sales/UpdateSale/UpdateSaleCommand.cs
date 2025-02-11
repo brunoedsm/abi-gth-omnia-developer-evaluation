@@ -3,7 +3,7 @@
 namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
 {
     /// <summary>
-    /// Command for Sale Creation
+    /// Command for Sale Update
     /// <see cref="Ambev.DeveloperEvaluation.Domain.Entities.Sale"/>
     /// </summary>
     public class UpdateSaleCommand : IRequest<UpdateSaleCommandResult>

@@ -1,10 +1,10 @@
 ﻿using Ambev.DeveloperEvaluation.Application.Base;
+using Ambev.DeveloperEvaluation.Application.Sales.GetSale;
 
-namespace Ambev.DeveloperEvaluation.Application.Sales.GetSale
+namespace Ambev.DeveloperEvaluation.Application.Sales.GetSales
 {
     /// <summary>
-    /// GetSaleCommandResult Data
-    /// <see cref="Ambev.DeveloperEvaluation.Domain.Entities.Sale"/> for documentation
+    /// Command result for Sales Retrieve
     /// </summary>
     public class GetSalesCommandResult : BaseResult
     {

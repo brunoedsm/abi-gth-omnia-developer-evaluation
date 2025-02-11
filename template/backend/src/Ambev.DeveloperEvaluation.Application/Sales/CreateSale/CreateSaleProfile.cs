@@ -1,16 +1,15 @@
-﻿using Ambev.DeveloperEvaluation.Application.Users.CreateUser;
-using Ambev.DeveloperEvaluation.Domain.Entities;
+﻿using Ambev.DeveloperEvaluation.Domain.Entities;
 using AutoMapper;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
 {
     /// <summary>
-    /// Profile for mapping between CreateSaleCommand and Sale Domain Entity
+    /// Profile for mapping between Command and Domain Entity
     /// </summary>
     public class CreateSaleProfile : Profile
     {
         /// <summary>
-        /// Initializes the mappings for CreateSaleCommand
+        /// Initializes the mappings for Create Sale
         /// </summary>
         public CreateSaleProfile()
         {

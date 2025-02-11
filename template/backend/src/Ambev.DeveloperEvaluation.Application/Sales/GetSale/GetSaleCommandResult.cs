@@ -3,7 +3,7 @@
 namespace Ambev.DeveloperEvaluation.Application.Sales.GetSale
 {
     /// <summary>
-    /// GetSaleCommandResult Data
+    /// Command result for Sale Retrieve
     /// <see cref="Ambev.DeveloperEvaluation.Domain.Entities.Sale"/> for documentation
     /// </summary>
     public class GetSaleCommandResult : BaseResult

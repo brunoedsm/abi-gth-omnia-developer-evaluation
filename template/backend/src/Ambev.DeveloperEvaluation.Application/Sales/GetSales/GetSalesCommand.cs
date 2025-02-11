@@ -1,7 +1,10 @@
 ﻿using MediatR;
 
-namespace Ambev.DeveloperEvaluation.Application.Sales.GetSale
+namespace Ambev.DeveloperEvaluation.Application.Sales.GetSales
 {
+    /// <summary>
+    /// Command for Sales Retrieve
+    /// </summary>
     public class GetSalesCommand : IRequest<GetSalesCommandResult>
     {
         public int? Skip { get; }

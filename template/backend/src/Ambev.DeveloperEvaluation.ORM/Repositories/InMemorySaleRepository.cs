@@ -19,10 +19,6 @@ namespace Ambev.DeveloperEvaluation.ORM.Repositories
             {
                 _sales[index] = sale;
             }
-            else
-            {
-                _sales.Add(sale);
-            }
             return Task.FromResult(true);
         }
 
