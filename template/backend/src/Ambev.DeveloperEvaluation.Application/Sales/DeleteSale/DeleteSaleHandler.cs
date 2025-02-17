@@ -1,25 +1,24 @@
 ﻿using Ambev.DeveloperEvaluation.Domain.Events;
-using System.Text.Json;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Ambev.DeveloperEvaluation.Application.Common;
-using Ambev.DeveloperEvaluation.Domain.Entities;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.DeleteSale
 {
     /// <summary>
     /// Handler for Sale Deletion
     /// </summary>
-    public class DeleteSaleHandler : BaseEventHandler<SaleCancelledEvent>, IRequestHandler<DeleteSaleCommand, DeleteSaleCommandResult>
+    public class DeleteSaleHandler : IRequestHandler<DeleteSaleCommand, DeleteSaleCommandResult>
     {
         private readonly ISaleRepository _saleRepository;
+        private readonly DeleteSaleNotificationService _notificationService;
         private readonly ILogger<DeleteSaleHandler> _logger;
         private readonly string objectName = nameof(DeleteSaleHandler);
 
-        public DeleteSaleHandler(ISaleRepository saleRepository, ILogger<DeleteSaleHandler> logger)
+        public DeleteSaleHandler(ISaleRepository saleRepository, DeleteSaleNotificationService notificationService, ILogger<DeleteSaleHandler> logger)
         {
             _saleRepository = saleRepository;
+            _notificationService = notificationService;
             _logger = logger;
         }
 
@@ -33,10 +32,11 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.DeleteSale
 
                 var existent = await _saleRepository.GetByIdAsync(command.Id) ?? throw new Exception("Resource (Sale) Not Found");
                 existent.IsCancelled = true;
-                
+
                 await _saleRepository.UpdateAsync(existent, cancellationToken);
 
-                _logger.LogInformation($"[{objectName}] - {Notify(new SaleCancelledEvent(existent))}");
+                var notificationResult = _notificationService.Notify(new SaleCancelledEvent(existent));
+                _logger.LogInformation($"[{objectName}] - {notificationResult}");
 
                 result.Success = true;
             }

@@ -1,5 +1,6 @@
 ﻿using Ambev.DeveloperEvaluation.Application.Sales.CreateSale;
 using Ambev.DeveloperEvaluation.Domain.Entities;
+using Ambev.DeveloperEvaluation.Domain.Events;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
@@ -11,6 +12,7 @@ namespace Ambev.DeveloperEvaluation.Unit.Application
     public class CreateSaleHandlerTests
     {
         private readonly Mock<ISaleRepository> _saleRepositoryMock;
+        private readonly Mock<CreateSaleNotificationService> _notificationServiceMock;
         private readonly IMapper _mapper;
         private readonly Mock<ILogger<CreateSaleHandler>> _loggerMock;
         private readonly CreateSaleHandler _handler;
@@ -18,10 +20,11 @@ namespace Ambev.DeveloperEvaluation.Unit.Application
         public CreateSaleHandlerTests()
         {
             _saleRepositoryMock = new Mock<ISaleRepository>();
+            _notificationServiceMock = new Mock<CreateSaleNotificationService>();
             var mapperConfig = new MapperConfiguration(cfg => cfg.AddProfile<CreateSaleProfile>());
             _mapper = new Mapper(mapperConfig);
             _loggerMock = new Mock<ILogger<CreateSaleHandler>>();
-            _handler = new CreateSaleHandler(_saleRepositoryMock.Object, _mapper, _loggerMock.Object);
+            _handler = new CreateSaleHandler(_saleRepositoryMock.Object, _notificationServiceMock.Object, _mapper, _loggerMock.Object);
         }
 
         [Fact]
@@ -55,6 +58,7 @@ namespace Ambev.DeveloperEvaluation.Unit.Application
             Assert.True(result.Success);
             Assert.NotEqual(result.Id, Guid.Empty);
             _saleRepositoryMock.Verify(repo => repo.CreateAsync(It.IsAny<Sale>(), It.IsAny<CancellationToken>()), Times.Once);
+            _notificationServiceMock.Verify(svc => svc.Notify(It.IsAny<SaleCreatedEvent>()), Times.Once);
         }
 
         [Fact]
@@ -102,6 +106,8 @@ namespace Ambev.DeveloperEvaluation.Unit.Application
             // Assert
             Assert.False(result.Success);
             Assert.Contains("Cannot sell more than 20 items per product.", result.Errors);
+            _saleRepositoryMock.Verify(repo => repo.CreateAsync(It.IsAny<Sale>(), It.IsAny<CancellationToken>()), Times.Never);
+            _notificationServiceMock.Verify(svc => svc.Notify(It.IsAny<SaleCreatedEvent>()), Times.Never);
         }
 
         [Fact]
@@ -130,6 +136,8 @@ namespace Ambev.DeveloperEvaluation.Unit.Application
             // Assert
             Assert.False(result.Success);
             Assert.Contains("Cannot apply discount to less than 4 items.", result.Errors);
+            _saleRepositoryMock.Verify(repo => repo.CreateAsync(It.IsAny<Sale>(), It.IsAny<CancellationToken>()), Times.Never);
+            _notificationServiceMock.Verify(svc => svc.Notify(It.IsAny<SaleCreatedEvent>()), Times.Never);
         }
 
         [Fact]
@@ -143,7 +151,14 @@ namespace Ambev.DeveloperEvaluation.Unit.Application
                 Branch = "Branch 1",
                 Date = DateTime.Now,
                 IsCancelled = false,
-                Items = null
+                Items =
+                 [
+                   new CreateSaleItemCommand(){ Product = "Product 1", Quantity = 1, UnitPrice = 10 },
+                   new CreateSaleItemCommand(){ Product = "Product 1", Quantity = 1, UnitPrice = 10 },
+                   new CreateSaleItemCommand(){ Product = "Product 1", Quantity = 1, UnitPrice = 10 },
+                   new CreateSaleItemCommand(){ Product = "Product 1", Quantity = 1, UnitPrice = 10 },
+                   new CreateSaleItemCommand(){ Product = "Product 1", Quantity = 1, UnitPrice = 10 }
+                 ]
             };
 
             _saleRepositoryMock.Setup(x => x.CreateAsync(It.IsAny<Sale>(), It.IsAny<CancellationToken>()))
@@ -155,6 +170,7 @@ namespace Ambev.DeveloperEvaluation.Unit.Application
             // Assert
             Assert.False(result.Success);
             Assert.Contains("Exception of type 'System.Exception' was thrown.", result.Errors);
+            _notificationServiceMock.Verify(svc => svc.Notify(It.IsAny<SaleCreatedEvent>()), Times.Never);
         }
     }
 

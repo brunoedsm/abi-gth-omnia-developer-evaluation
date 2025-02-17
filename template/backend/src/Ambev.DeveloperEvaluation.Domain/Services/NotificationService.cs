@@ -1,20 +1,16 @@
 ﻿using System.Text.Json;
 using Ambev.DeveloperEvaluation.Domain.Common;
 
-namespace Ambev.DeveloperEvaluation.Application.Common
+namespace Ambev.DeveloperEvaluation.Domain.Services
 {
-    /// <summary>
-    /// Generic Handler for event broadcast (message broker)
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public abstract class BaseEventHandler<T> where T : BaseEvent
+    public abstract class NotificationService<T> where T : BaseEvent
     {
         /// <summary>
-        /// 
+        /// Generic Notification Service for message publish
         /// </summary>
         /// <param name="event"></param>
         /// <returns></returns>
-        public string Notify(BaseEvent @event)
+        public virtual string Notify(BaseEvent @event)
         {
             try
             {
