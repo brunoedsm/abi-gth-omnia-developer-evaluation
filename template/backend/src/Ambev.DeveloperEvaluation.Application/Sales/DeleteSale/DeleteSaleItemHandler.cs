@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+﻿using Ambev.DeveloperEvaluation.Application.Common;
 using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Events;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
@@ -10,7 +10,7 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.DeleteSale
     /// <summary>
     /// Handler for Sale Item Deletion
     /// </summary>
-    public class DeleteSaleItemHandler : IRequestHandler<DeleteSaleItemCommand, DeleteSaleCommandResult>
+    public class DeleteSaleItemHandler : BaseEventHandler<SaleItemCancelledEvent>, IRequestHandler<DeleteSaleItemCommand, DeleteSaleCommandResult>
     {
         private readonly ISaleRepository _saleRepository;
         private readonly ILogger<DeleteSaleItemHandler> _logger;
@@ -48,7 +48,7 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.DeleteSale
 
                 foreach (var item in itemsCancelled)
                 {
-                    NotifySaleItemCancelled(new SaleItemCancelledEvent(item));
+                    _logger.LogInformation($"[{objectName}] - {Notify(new SaleItemCancelledEvent(item))}");
                 }
 
                 result.Success = true;
@@ -61,23 +61,5 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.DeleteSale
 
             return result;
         }
-
-        /// <summary>
-        /// Generic message broker event sent
-        /// </summary>
-        /// <param name="evt"></param>
-        private void NotifySaleItemCancelled(SaleItemCancelledEvent evt)
-        {
-            var message = JsonSerializer.Serialize(new
-            {
-                Event = nameof(evt),
-                Data = JsonSerializer.Serialize(evt.SaleItem),
-                Timestamp = DateTime.UtcNow
-            });
-
-            // Simulação do envio ao message broker
-            _logger.LogInformation("Publishing event to Message Broker: {Message}", message);
-        }
-
     }
 }

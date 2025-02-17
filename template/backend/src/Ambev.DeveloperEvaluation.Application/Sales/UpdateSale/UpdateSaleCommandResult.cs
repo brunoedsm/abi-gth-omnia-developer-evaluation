@@ -1,4 +1,4 @@
-﻿using Ambev.DeveloperEvaluation.Application.Base;
+﻿using Ambev.DeveloperEvaluation.Application.Common;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale
 {

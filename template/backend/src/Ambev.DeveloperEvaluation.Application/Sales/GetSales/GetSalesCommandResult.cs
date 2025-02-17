@@ -1,4 +1,4 @@
-﻿using Ambev.DeveloperEvaluation.Application.Base;
+﻿using Ambev.DeveloperEvaluation.Application.Common;
 using Ambev.DeveloperEvaluation.Application.Sales.GetSale;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.GetSales

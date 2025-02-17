@@ -1,0 +1,15 @@
+uses: actions/checkout@v3
+    
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'  # Based on projects, can be configured to get latest stable ever single run
+    
+    - name: Restore dependencies
+      run: dotnet restore template/backend/Ambev.DeveloperEvaluation.sln
+    
+    - name: Build project
+      run: dotnet build template/backend/Ambev.DeveloperEvaluation.sln --no-restore --configuration Release
+    
+    - name: Run tests
+      run: dotnet test template/backend/tests --no-build --configuration Release --logger trx
