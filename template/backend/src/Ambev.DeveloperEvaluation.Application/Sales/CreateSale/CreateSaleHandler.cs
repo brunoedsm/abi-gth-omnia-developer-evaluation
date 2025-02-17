@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+﻿using Ambev.DeveloperEvaluation.Application.Common;
 using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Events;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
@@ -13,7 +13,7 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
     /// <summary>
     /// Handler for Sale Creation
     /// </summary>
-    public class CreateSaleHandler : IRequestHandler<CreateSaleCommand, CreateSaleCommandResult>
+    public class CreateSaleHandler : BaseEventHandler<SaleCreatedEvent>, IRequestHandler<CreateSaleCommand, CreateSaleCommandResult>
     {
         private readonly ISaleRepository _saleRepository;
         private readonly IMapper _mapper;
@@ -51,10 +51,10 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
 
                 await _saleRepository.CreateAsync(sale, cancellationToken);
                 result.Id = sale.Id;
+
+                _logger.LogInformation($"[{objectName}] - {Notify(new SaleCreatedEvent(sale))}");
+
                 result.Success = true;
-
-                NotifySaleCreated(new SaleCreatedEvent(sale));
-
             }
             catch (Exception ex)
             {
@@ -65,23 +65,5 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
             return result;
 
         }
-
-        /// <summary>
-        /// Generic message broker event sent
-        /// </summary>
-        /// <param name="evt"></param>
-        private void NotifySaleCreated(SaleCreatedEvent evt)
-        {
-            var message = JsonSerializer.Serialize(new
-            {
-                Event = nameof(evt),
-                Data = JsonSerializer.Serialize(evt.Sale),
-                Timestamp = DateTime.UtcNow
-            });
-
-            // Simulação do envio ao message broker
-            _logger.LogInformation("Publishing event to Message Broker: {Message}", message);
-        }
-
     }
 }

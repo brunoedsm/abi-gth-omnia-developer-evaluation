@@ -1,4 +1,4 @@
-﻿namespace Ambev.DeveloperEvaluation.Application.Base
+﻿namespace Ambev.DeveloperEvaluation.Application.Common
 {
     /// <summary>
     /// Base Command Result class

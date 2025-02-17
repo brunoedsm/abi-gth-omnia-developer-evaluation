@@ -1,14 +1,13 @@
+using Ambev.DeveloperEvaluation.Domain.Common;
 using Ambev.DeveloperEvaluation.Domain.Entities;
 
 namespace Ambev.DeveloperEvaluation.Domain.Events
 {
-    public class SaleModifiedEvent
+    public class SaleModifiedEvent : BaseEvent
     {
-        public Sale Sale { get; }
-
-        public SaleModifiedEvent(Sale sale)
+        public SaleModifiedEvent(Sale sale) : base(sale)
         {
-            Sale = sale;
+
         }
     }
 }

@@ -80,7 +80,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales
         {
             var salesResult = await _mediator.Send(new GetSalesCommand(skip, take));
 
-            return salesResult.Sales.Any() ? Ok(_mapper.Map<IEnumerable<GetSaleResponse>>(salesResult.Sales)) : (ActionResult)NotFound();
+            return salesResult?.Sales?.Count() > 0 ? Ok(_mapper.Map<IEnumerable<GetSaleResponse>>(salesResult.Sales)) : (ActionResult)NotFound();
         }
 
         /// <summary>

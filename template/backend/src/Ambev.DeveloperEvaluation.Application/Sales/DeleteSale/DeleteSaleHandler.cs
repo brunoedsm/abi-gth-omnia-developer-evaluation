@@ -3,13 +3,15 @@ using System.Text.Json;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Ambev.DeveloperEvaluation.Application.Common;
+using Ambev.DeveloperEvaluation.Domain.Entities;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.DeleteSale
 {
     /// <summary>
     /// Handler for Sale Deletion
     /// </summary>
-    public class DeleteSaleHandler : IRequestHandler<DeleteSaleCommand, DeleteSaleCommandResult>
+    public class DeleteSaleHandler : BaseEventHandler<SaleCancelledEvent>, IRequestHandler<DeleteSaleCommand, DeleteSaleCommandResult>
     {
         private readonly ISaleRepository _saleRepository;
         private readonly ILogger<DeleteSaleHandler> _logger;
@@ -28,13 +30,13 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.DeleteSale
 
             try
             {
-                var existent = await _saleRepository.GetByIdAsync(command.Id) ?? throw new Exception("Resource (Sale) Not Found");
-                
-                existent.IsCancelled = true;
 
-                await _saleRepository.UpdateAsync(existent, cancellationToken);
+                var existent = await _saleRepository.GetByIdAsync(command.Id) ?? throw new Exception("Resource (Sale) Not Found");
+                existent.IsCancelled = true;
                 
-                NotifySaleCancelled(new SaleCancelledEvent(existent));
+                await _saleRepository.UpdateAsync(existent, cancellationToken);
+
+                _logger.LogInformation($"[{objectName}] - {Notify(new SaleCancelledEvent(existent))}");
 
                 result.Success = true;
             }
@@ -45,23 +47,6 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.DeleteSale
             }
 
             return result;
-        }
-
-        /// <summary>
-        /// Generic message broker event sent
-        /// </summary>
-        /// <param name="evt"></param>
-        private void NotifySaleCancelled(SaleCancelledEvent evt)
-        {
-            var message = JsonSerializer.Serialize(new
-            {
-                Event = nameof(evt),
-                Data = JsonSerializer.Serialize(evt.Sale),
-                Timestamp = DateTime.UtcNow
-            });
-
-            // Simulação do envio ao message broker
-            _logger.LogInformation("Publishing event to Message Broker: {Message}", message);
         }
     }
 }
