@@ -1,5 +1,4 @@
-﻿using Ambev.DeveloperEvaluation.Application.Common;
-using Ambev.DeveloperEvaluation.Domain.Entities;
+﻿using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Events;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using Ambev.DeveloperEvaluation.Domain.Specifications;
@@ -13,16 +12,19 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
     /// <summary>
     /// Handler for Sale Creation
     /// </summary>
-    public class CreateSaleHandler : BaseEventHandler<SaleCreatedEvent>, IRequestHandler<CreateSaleCommand, CreateSaleCommandResult>
+    public class CreateSaleHandler : IRequestHandler<CreateSaleCommand, CreateSaleCommandResult>
     {
         private readonly ISaleRepository _saleRepository;
+        private readonly CreateSaleNotificationService _notificationService;
         private readonly IMapper _mapper;
         private readonly ILogger<CreateSaleHandler> _logger;
+
         private readonly string objectName = nameof(CreateSaleHandler);
 
-        public CreateSaleHandler(ISaleRepository saleRepository, IMapper mapper, ILogger<CreateSaleHandler> logger)
+        public CreateSaleHandler(ISaleRepository saleRepository,CreateSaleNotificationService notificationService, IMapper mapper, ILogger<CreateSaleHandler> logger)
         {
             _saleRepository = saleRepository;
+            _notificationService = notificationService;
             _mapper = mapper;
             _logger = logger;
         }
@@ -52,7 +54,9 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
                 await _saleRepository.CreateAsync(sale, cancellationToken);
                 result.Id = sale.Id;
 
-                _logger.LogInformation($"[{objectName}] - {Notify(new SaleCreatedEvent(sale))}");
+                var notificationResult = _notificationService.Notify(new SaleCreatedEvent(sale));
+
+                _logger.LogInformation($"[{objectName}] - {notificationResult}");
 
                 result.Success = true;
             }

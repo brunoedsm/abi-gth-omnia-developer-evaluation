@@ -36,6 +36,10 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.GetSale
                     result = _mapper.Map<GetSaleCommandResult>(existentSale);
                     result.Success = true;
                 }
+                else
+                {
+                    result.Errors.Add("Sale Not Found!");
+                }
             }
             catch (Exception ex)
             {

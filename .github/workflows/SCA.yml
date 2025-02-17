@@ -1,4 +1,4 @@
-name: .NET Core CI
+name: SCA (Software Composition Analysis) stage
 
 on:
   push:
@@ -19,7 +19,7 @@ jobs:
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '8.0.x'  # Altere conforme a versão do .NET utilizada
+          dotnet-version: '8.0.x'  # Can be configured to get latest stable on ever single run
       
       - name: Restore dependencies
         run: dotnet restore template/backend/Ambev.DeveloperEvaluation.sln
@@ -27,5 +27,17 @@ jobs:
       - name: Build project
         run: dotnet build template/backend/Ambev.DeveloperEvaluation.sln --no-restore --configuration Release
       
-      - name: Run tests
-        run: dotnet test template/backend/tests --no-build --configuration Release --logger trx
+      - name: Run Unit Tests
+        run: dotnet test template/backend/tests/Ambev.DeveloperEvaluation.Unit/ --no-build --configuration Release --logger trx
+      
+      - name: Run Functional Tests
+        run: dotnet test template/backend/tests/Ambev.DeveloperEvaluation.Functional/ --no-build --configuration Release --logger trx
+
+      - name: Run Integration Tests
+        run: dotnet test template/backend/tests/Ambev.DeveloperEvaluation.Integration/ --no-build --configuration Release --logger trx
+    
+    # Next steps according to my xp: 
+    # - Run SonarQube Analysis collecting test results (and other OWASP tools like Checkmarx/BlackDuck)
+    # - Create container (Docker) image with application code already validated
+    # - Publish image on container registry service (e.g.: AWS ECR, Azure ACR)
+    # - Trigger release on K8s service.

@@ -1,4 +1,5 @@
-﻿using Ambev.DeveloperEvaluation.Application.Sales.GetSale;
+﻿using System.Diagnostics.CodeAnalysis;
+using Ambev.DeveloperEvaluation.Application.Sales.GetSale;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using AutoMapper;
 using MediatR;
@@ -35,6 +36,10 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.GetSales
                 {
                     result.Sales = _mapper.Map<IEnumerable<GetSaleCommandResult>>(pagedSales);
                     result.Success = true;
+                }
+                else
+                {
+                    result.Errors.Add("Sales Not Found!");
                 }
             }
             catch (Exception ex)

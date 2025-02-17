@@ -1,5 +1,4 @@
-﻿using Ambev.DeveloperEvaluation.Application.Common;
-using Ambev.DeveloperEvaluation.Domain.Entities;
+﻿using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Events;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using MediatR;
@@ -10,15 +9,17 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.DeleteSale
     /// <summary>
     /// Handler for Sale Item Deletion
     /// </summary>
-    public class DeleteSaleItemHandler : BaseEventHandler<SaleItemCancelledEvent>, IRequestHandler<DeleteSaleItemCommand, DeleteSaleCommandResult>
+    public class DeleteSaleItemHandler : IRequestHandler<DeleteSaleItemCommand, DeleteSaleCommandResult>
     {
         private readonly ISaleRepository _saleRepository;
+        private readonly DeleteSaleItemNotificationService _notificationService;
         private readonly ILogger<DeleteSaleItemHandler> _logger;
         private readonly string objectName = nameof(DeleteSaleItemHandler);
 
-        public DeleteSaleItemHandler(ISaleRepository saleRepository, ILogger<DeleteSaleItemHandler> logger)
+        public DeleteSaleItemHandler(ISaleRepository saleRepository, DeleteSaleItemNotificationService notificationService, ILogger<DeleteSaleItemHandler> logger)
         {
             _saleRepository = saleRepository;
+            _notificationService = notificationService;
             _logger = logger;
         }
 
@@ -48,7 +49,8 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.DeleteSale
 
                 foreach (var item in itemsCancelled)
                 {
-                    _logger.LogInformation($"[{objectName}] - {Notify(new SaleItemCancelledEvent(item))}");
+                    var notificationResult = _notificationService.Notify(new SaleItemCancelledEvent(item));
+                    _logger.LogInformation($"[{objectName}] - {notificationResult}");
                 }
 
                 result.Success = true;
