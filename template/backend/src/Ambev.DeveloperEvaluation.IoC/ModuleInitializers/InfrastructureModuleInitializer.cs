@@ -1,4 +1,7 @@
-﻿using Ambev.DeveloperEvaluation.Domain.Repositories;
+using Ambev.DeveloperEvaluation.Application.Sales.CreateSale;
+using Ambev.DeveloperEvaluation.Application.Sales.UpdateSale;
+using Ambev.DeveloperEvaluation.Application.Sales.DeleteSale;
+using Ambev.DeveloperEvaluation.Domain.Repositories;
 using Ambev.DeveloperEvaluation.ORM;
 using Ambev.DeveloperEvaluation.ORM.Repositories;
 using Microsoft.AspNetCore.Builder;
@@ -14,5 +17,8 @@ public class InfrastructureModuleInitializer : IModuleInitializer
         builder.Services.AddScoped<DbContext>(provider => provider.GetRequiredService<DefaultContext>());
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddSingleton<ISaleRepository, InMemorySaleRepository>();
+        builder.Services.AddSingleton<CreateSaleNotificationService>();
+        builder.Services.AddSingleton<UpdateSaleNotificationService>();
+        builder.Services.AddSingleton<DeleteSaleNotificationService>();
     }
 }
